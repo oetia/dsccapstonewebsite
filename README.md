@@ -28,7 +28,7 @@ For this reason, functions have been predefined for actions such as `click`, `fi
 
 After an action is used to step the environment, an observation is returned. This observation is also provided upon the environment instantiation. By default it contains the page HTML, AXTree, and a screenshot of the current state. Directly passing in all of this information into the context of an LLM, especially the HTML, seems to lead to a significant amount of noise, and degrades performance. For a webpage such as Reddit, the HTML you'd get from the homepage can easily be hundreds or even thousands of lines long. If the first step of your task is just to use the search bar to look for a specific subreddit, 99\%+ of the elements will be irrelevant. The same to some extent also applies to the accessibility tree, however, the AXTree being a significantly more compact representation, takes up significantly less context. Only the AXTree ends up being passed into LLM context. 
 
-For screenshots, since current LLMs tend to struggle with grounding, the screenshots are further augmented with a set of marks (SoM) \cite{yang2023set}. 
+For screenshots, since current LLMs tend to struggle with grounding, the screenshots are further augmented with a set of marks (SoM) (Yang 2023). 
 
 ### Search
 
@@ -37,7 +37,6 @@ At every step, a single action can be taken to expand into a new state. For a gi
 ### Implicit Search on the Environment
 
 You could backtrack by relying on the LLM agent to undo it's action, i.e. if a subscribe button is clicked, it would then click the unsubscribe button to undo it. However, if the LLM clicked a button which brings up a modal form, where it's still on the same page, then to close the modal, the LLM sends the go\_back action, which navigates to the previous page, then while it has closed the modal, it has gone back too far and failed it's backtrack. While such scenarios should be recoverable, empirically speaking, the LLM struggles to do so, and task execution becomes messy.
-
 
 ### Explicit Search on the Environment
 
@@ -51,7 +50,6 @@ This does make implicitly searching on the environment preferable to explicitly 
 
 
 ### Comparing Explicit and Implicit Environment Search
-
 
 Implicit search is essentially greedy search, and greedy search can be represented through MCTS with only a single iteration. Visitation statistics do not accumulate, so the only information being used to decide which node to expand next is the LLM evaluation of an action (fast reward). Implicit search will be implemented as MCTS(depth=..., iterations=1).
 
@@ -72,5 +70,5 @@ Despite gpt-4o-mini being a distill of gpt-4o, the scaling results may not neces
 
 ### Search on an Internal World Model
 
-Another alternative to addressing the backtracking issue in the explicit search on the environment case is to search and backtrack not on the actual environment, but instead on a simulated "LLM dream". On top of having a step function for the browsergym environment, you also have the LLM approximate the results on the step function. This addresses the issue of some actions being irreversible with the downside of becoming dependent on the LLM's ability to "dream" the browser environment accurately. As such, the LLM is considered an Internal (as opposed to the external, real browser environment) World Model (where our "world" is the browser environment).  
+Another alternative to addressing the backtracking issue in the explicit search on the environment case is to search and backtrack not on the actual environment, but instead on a simulated "LLM dream". On top of having a step function for the browsergym environment, you also have the LLM approximate the results on the step function. This addresses the issue of some actions being irreversible with the downside of becoming dependent on the LLM's ability to "dream" the browser environment accurately. As such, the LLM is considered an Internal (as opposed to the external, real browser environment) World Model (where our "world" is the browser environment). 
 
