@@ -2,7 +2,9 @@
 
 Trevan Nguyen, Nathaniel Del Rosario, Aaryan Agrawal, Zihan Liu, Samuel Zhang, Zhiting Hu
 
-## Demo Video
+## Demo
+
+[Twitter Release Post](https://x.com/MaitrixOrg/status/1870222460051960145)
 
 <iframe width="100%" height="400" src="https://www.youtube.com/embed/h1ILgb-8Mvo" frameborder="0" allowfullscreen></iframe>
 
@@ -75,4 +77,8 @@ Despite gpt-4o-mini being a distill of gpt-4o, the scaling results may not neces
 **Search on an Internal World Model**
 
 Another alternative to addressing the backtracking issue in the explicit search on the environment case is to search and backtrack not on the actual environment, but instead on a simulated "LLM dream". On top of having a step function for the browsergym environment, you also have the LLM approximate the results on the step function. This addresses the issue of some actions being irreversible with the downside of becoming dependent on the LLM's ability to "dream" the browser environment accurately. As such, the LLM is considered an Internal (as opposed to the external, real browser environment) World Model (where our "world" is the browser environment). 
+
+
+## Results
+
 
