@@ -2,7 +2,9 @@
 
 Trevan Nguyen, Nathaniel Del Rosario, Aaryan Agrawal, Zihan Liu, Samuel Zhang, Zhiting Hu
 
-<iframe width="100%" height="500" src="https://www.youtube.com/embed/h1ILgb-8Mvo" frameborder="0" allowfullscreen></iframe>
+## Demo Video
+
+<iframe width="100%" height="400" src="https://www.youtube.com/embed/h1ILgb-8Mvo" frameborder="0" allowfullscreen></iframe>
 
 ## Introduction 
 
