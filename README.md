@@ -99,6 +99,10 @@ Another alternative to addressing the backtracking issue in the explicit search 
 
 To best support the development of reasoning algorithms, we have directly integrated the improved LLM reasoners visualizer into the AgentLab x-ray tool. Using AgentLab, every action the LLM takes first generates an MCTS tree that is searched for the best outcome. When looking at a run, it is inconvenient to move to a different website to look at the visualizer for each step. Thus, the visualizer is created automatically for each action and embedded directly in the x-ray tool.
 
-Some Example Visualizer Links: [1](https://www.llm-reasoners.net/visualizer/3d03a5cb-d67a-4f38-bf81-0ca8ec3b28e8?accessKey=f0f4b36b) [2](https://www.llm-reasoners.net/visualizer/96e5f87d-4b70-4e61-8b47-d3fc57879204?accessKey=9f69d408)
+**Some Example Visualizer Links: [1](https://www.llm-reasoners.net/visualizer/3d03a5cb-d67a-4f38-bf81-0ca8ec3b28e8?accessKey=f0f4b36b) [2](https://www.llm-reasoners.net/visualizer/96e5f87d-4b70-4e61-8b47-d3fc57879204?accessKey=9f69d408)**
+
+<p align="center">
+  <img src="./images/xray.png"/>
+</p>
 
 ## Results
