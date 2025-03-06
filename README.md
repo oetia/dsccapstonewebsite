@@ -2,6 +2,8 @@
 
 Trevan Nguyen, Nathaniel Del Rosario, Aaryan Agrawal, Zihan Liu, Samuel Zhang, Zhiting Hu
 
+<iframe width="560" height="315" src="https://youtu.be/h1ILgb-8Mvo" frameborder="0" allowfullscreen></iframe>
+
 ## Introduction 
 
 The web is an expansive and dynamic environment, hosting an immense wealth of information and variety in user interfaces. As the digital world has become an integral component of our world, automating interactions with the web has become an increasingly compelling goal. Web agents hold the promise of transforming how we fundamentally interact with online platforms. These agents could streamline workflows, assist in research, facilitate accessibility, and even execute complex multi-step tasks across different websites.
