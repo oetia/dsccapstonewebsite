@@ -18,6 +18,22 @@ Recent advances in large language models (LLMs) have significantly improved the 
 
 Web-based agents using LLMs show promise in automating browser tasks, but scaling inference efficiently remains a challenge. This work explores the question of how best to structure search: implicit (greedy, depth-limited) or explicit (structured exploration like MCTS). Implicit search is potentially computationally cheaper but struggles with backtracking, while explicit search enables efficient exploration but relies on resettable states, which may be impractical in real-world web environments. Experiments on 106 WebArena tasks show explicit search achieves higher task completion rates and better environment interaction efficiency. While explicit search excels in controlled settings, implicit search remains more applicable to real-world tasks. Another aspect to consider is conducting an explicit search on an LLM world model, where the search occurs over predicted next states as opposed to the environment itself, which can potentially gain the benefits of both implicit and explicit search. These techniques extend beyond web environments, and are applicable to OS automation (OsWorld) and dynamic game environments (MineDojo).
 
+
+### LLM-Reasoners
+
+[LLM-Reasoners](https://www.llm-reasoners.net/) (Hao 2024) is a standardized, library for creating reasoning agents with a modular framework for customizing the LLM, search algorithm, search configuration, world model, and benchmark architecture. We leverage LLM-Reasoners to investigate this behavior in Monte Carlo Tree Search (MCTS) scaling experiments. 
+
+<!--Insert Plots-->
+![Custom Agent Architecture via LLM-Reasoners](/images/reasoners.png)
+- Custom Agent Architecture via LLM-Reasoners
+
+![MCTS Tree + Visualizer Architecture](/images/visualizer.png)
+- LLM-Reasoners visualizer architecture
+
+![MCTS Tree + Visualizer Architecture](/images/bigdfs.png)
+- MCTS Tree via LLM-Reasoners visualizer
+
+
 ## Methods - Browsergym
 
 **Browsergym**
@@ -185,8 +201,34 @@ When comparing the two, as expected, since the explicit search is fundamentally 
 
 ## Methods - OSWorld
 
+[OSWorld](https://os-world.github.io/) is a desktop environment for evaluating agents on operating system benchmark tasks such as Chrome, VSCode, Gimp, etc. To complete a task, a web agent must take multiple sequential actions. Errors in later steps can make a task irrecoverable without backtracking. Two primary approaches to search are considered: implicit search, where the agent itself attempts to recover from mistakes, and explicit search, where a structured algorithm like Monte Carlo Tree Search (MCTS) assists in decision-making.
+
+<video width="720" height="480" controls>
+  <source src="../assets/images/change-search-engine.mp4" type="video/mp4">
+</video>
+
+- Example OSWorld Task - "Change the default Search Engine"
+
+
 ## Results OSWorld
 
+In summary, the UITARS-72B model performed substantially better than both 4o-mini and 4o, and in general task success saw an increased correlation with the number of MCTS iterations and depth.
+
+<!--OSWorld Inference/Compute Scaling Plots-->
+![](/images/uitars-depth-of-n.png)
+- Depth of N Scaling
+
+![Test Time Scaling](/images/7B-scaling.png)
+- UITARS-7B through 15 Steps (no MCTS)
+
+![Test Time Scaling](/images/72B-scaling.png)
+- UITARS-72B through 15 Steps (no MCTS)
+
+
 ## Discussion
+
+Web/OS-based agents using LLMs show promise in automating browser tasks, but scaling inference efficiently remains a challenge. This work explores the question of how best to structure search: implicit (greedy, depth-limited) or explicit (structured exploration like MCTS). Implicit search is potentially computationally cheaper but struggles with backtracking, while explicit search enables efficient exploration but relies on resettable states, which may be impractical in real-world web environments. 
+
+Experiments on 106 WebArena and 50 OSWorld tasks show explicit search achieves higher task completion rates and better environment interaction efficiency. While explicit search excels in controlled settings, implicit search remains more applicable to real-world tasks. Another aspect to consider is conducting an explicit search on an LLM world model, where the search occurs over predicted next states as opposed to the environment itself, which can potentially gain the benefits of both implicit and explicit search.
 
 ## Conclusion
