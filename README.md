@@ -18,7 +18,7 @@ Recent advances in large language models (LLMs) have significantly improved the 
 
 Web-based agents using LLMs show promise in automating browser tasks, but scaling inference efficiently remains a challenge. This work explores the question of how best to structure search: implicit (greedy, depth-limited) or explicit (structured exploration like MCTS). Implicit search is potentially computationally cheaper but struggles with backtracking, while explicit search enables efficient exploration but relies on resettable states, which may be impractical in real-world web environments. Experiments on 106 WebArena tasks show explicit search achieves higher task completion rates and better environment interaction efficiency. While explicit search excels in controlled settings, implicit search remains more applicable to real-world tasks. Another aspect to consider is conducting an explicit search on an LLM world model, where the search occurs over predicted next states as opposed to the environment itself, which can potentially gain the benefits of both implicit and explicit search. These techniques extend beyond web environments, and are applicable to OS automation (OsWorld) and dynamic game environments (MineDojo).
 
-## Methods
+## Methods - Browsergym
 
 **Browsergym**
 
@@ -89,7 +89,9 @@ In the context of browsergym, the benchmark used for these experimental runs wil
 
 With a provided key with \$200 of credit, not only is a subset needed, but also a cheaper model. These experiments will be conducted on said subset of 106 tasks, and also utilize gpt-4o-mini instead of gpt-4o, which should further reduce the costs by approximately 15 fold. The number of action proposals at each step will be kept at 10. While it could be set much higher, with a proposal temperature of 0.7, often over half of the proposals end up being duplicate actions. Scaling n proposals at each step is another axis and increasing it to a 100 or more would likely also benefit performance, but that can be explored later. For now, keeping n proposals fixed at 10 should provide enough variety in responses for benefits to be attainable from search.
 
-Despite gpt-4o-mini being a distill of gpt-4o, the scaling results may not necessarily generalize to gpt-4o, and should be taken with caution.
+Despite gpt-4o-mini being a distill of gpt-4o, the scaling results may not necessarily generalize to gpt-4o or other models and should be taken with caution.
+
+For this reason, alongside the axes of iterations and depth, there will be another axis of the LLM used. separate runs will also be performed on other strong open source models to ensure that these findings generalize. The models of interest are Qwen2.5-32B-Instruct, and the deepseek r1 distill onto it. At the time of writing, Qwen 2.5 32B is one of the strongest open source 32B models, so it should be fairly representative. As these models can be hosted locally via fast inference frameworks such as SGLang, the cost should be minimal compared to APIs.
 
 **Search on an Internal World Model**
 
@@ -105,4 +107,35 @@ To best support the development of reasoning algorithms, we have directly integr
   <img src="./images/xray.png"/>
 </p>
 
-## Results
+**Visualizer Architecture Backend**
+
+<p align="center">
+  <img src="./images/visualizer-backend.png"/>
+</p>
+
+## Results - Browsergym
+
+| Name                                          | Successes | Failures | Errors |
+| --------------------------------------------- | --------- | -------- | ------ |
+| 4o-mini MCTS (depth=5, iterations=10)         | 15        | 89       | 2      |
+| 4o-mini MCTS (depth=10, iterations=10)        | 21        | 82       | 3      |
+| 4o-mini MCTS (depth=20, iterations=10)        | 35        | 67       | 4      |
+| 4o-mini MCTS (depth=100, iterations=1)        | 23        | 71       | 4      |
+|                                               |           |          |        |
+| qwen2.5-32b MCTS (depth=5, iterations=10)     | 8         | 91       | 7      |
+| qwen2.5-32b MCTS (depth=10, iterations=10)    | 12        | 85       | 9      |
+| qwen2.5-32b MCTS (depth=20, iterations=10)    | 14        | 83       | 9      |
+| qwen2.5-32b MCTS (depth=100, iterations=1)    | 9         | 74       | 13     |
+|                                               |           |          |        |
+| r1-distill-32b MCTS (depth=5, iterations=10)  | 25        | 81       | 0      |
+| r1-distill-32b MCTS (depth=10, iterations=10) | 34        | 69       | 3      |
+| r1-distill-32b MCTS (depth=20, iterations=10) | 35        | 70       | 1      |
+| r1-distill-32b MCTS (depth=100, iterations=1) | 28        | 75       | 3      |
+
+## Methods - OSWorld
+
+## Results OSWorld
+
+## Discussion
+
+## Conclusion
