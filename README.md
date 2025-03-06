@@ -193,8 +193,8 @@ When comparing the two, as expected, since the explicit search is fundamentally 
 
 [OSWorld](https://os-world.github.io/) is a desktop environment for evaluating agents on operating system benchmark tasks such as Chrome, VSCode, Gimp, etc. To complete a task, a web agent must take multiple sequential actions. Errors in later steps can make a task irrecoverable without backtracking. Two primary approaches to search are considered: implicit search, where the agent itself attempts to recover from mistakes, and explicit search, where a structured algorithm like Monte Carlo Tree Search (MCTS) assists in decision-making.
 
-<video width="720" height="480" controls>
-  <source src="../assets/images/change-search-engine.mp4" type="video/mp4">
+<video width="100%" controls>
+  <source src="images/change-search-engine.mp4" type="video/mp4">
 </video>
 
 - Example OSWorld Task - "Change the default Search Engine"
