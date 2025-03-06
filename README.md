@@ -14,31 +14,31 @@ Web-based agents using LLMs show promise in automating browser tasks, but scalin
 
 ## Methods
 
-### Browsergym
+** Browsergym **
 
 Browsergym (Chezelles 2024) is the primary environment that we are focusing on. Browsergym essentially provides an OpenAI gym-like environment (Brockman 2016) for the web browser. The env object takes in an action represented as code and provides an observation at each step. By utilizing the browsergym library, we can test the performance of our web agent on two key browser task benchmarks: WebArena (Zhou 2023) and Assistantbench (Yoran 2024).
 
-### Actions
+** Actions **
 
 How the action is represented is something that can be slightly finicky. Since browsergym is built off of playwright, the action is going to eventually be JavaScript code that is executed to interact with the DOM. The space of all possible JavaScript code is a massive action space, and allowing an agent to directly interact with this space creates an correspondingly massive search space. Setting aside issues with search complexity and code correctness, fundamentally all of the tasks that such an agent would be expected to solve, would be doable with the action space available to the average human end user, i.e. just a keyboard and mouse. 
 
 For this reason, functions have been predefined for actions such as `click`, `fill`, `go\_back`, `go\_forward`, etc. While the environment can accept arbitrary code, the agent has been instructed to only provide a specific set of function calls constrained to a "human" action space. 
 
-### Observations
+** Observations **
 
 After an action is used to step the environment, an observation is returned. This observation is also provided upon the environment instantiation. By default it contains the page HTML, AXTree, and a screenshot of the current state. Directly passing in all of this information into the context of an LLM, especially the HTML, seems to lead to a significant amount of noise, and degrades performance. For a webpage such as Reddit, the HTML you'd get from the homepage can easily be hundreds or even thousands of lines long. If the first step of your task is just to use the search bar to look for a specific subreddit, 99\%+ of the elements will be irrelevant. The same to some extent also applies to the accessibility tree, however, the AXTree being a significantly more compact representation, takes up significantly less context. Only the AXTree ends up being passed into LLM context. 
 
 For screenshots, since current LLMs tend to struggle with grounding, the screenshots are further augmented with a set of marks (SoM) (Yang 2023). 
 
-### Search
+** Search **
 
 At every step, a single action can be taken to expand into a new state. For a given task, there can often be over a dozen steps needed to reach completion. If there's a situation where the first ten steps are correct, but a minor mistake is made on the eleventh step, the task would become in-completable without backtracking. 
 
-### Implicit Search on the Environment
+** Implicit Search on the Environment **
 
 You could backtrack by relying on the LLM agent to undo it's action, i.e. if a subscribe button is clicked, it would then click the unsubscribe button to undo it. However, if the LLM clicked a button which brings up a modal form, where it's still on the same page, then to close the modal, the LLM sends the go\_back action, which navigates to the previous page, then while it has closed the modal, it has gone back too far and failed it's backtrack. While such scenarios should be recoverable, empirically speaking, the LLM struggles to do so, and task execution becomes messy.
 
-### Explicit Search on the Environment
+** Explicit Search on the Environment **
 
 An alternative would be relying on a search algorithm, such as MCTS, to do backtracking for you. In an arbitrary environment, this could involve resetting the environment, then replaying all actions, but in the web case, you can do something more sophisticated with caching and reloading web pages. Having an explicit search algorithm like MCTS also provides other benefits in that an LLM doesn't need to identify the correct backtrack and subsequent next node to end up finding the correct trajectory. 
 
@@ -49,7 +49,7 @@ It should be noted that a strong assumption is being made here that backtracking
 This does make implicitly searching on the environment preferable to explicitly doing so in many cases, as there is no dependence on such an assisted backtrack. Comparing the performance of these two would be interesting. 
 
 
-### Comparing Explicit and Implicit Environment Search
+** Comparing Explicit and Implicit Environment Search **
 
 Implicit search is essentially greedy search, and greedy search can be represented through MCTS with only a single iteration. Visitation statistics do not accumulate, so the only information being used to decide which node to expand next is the LLM evaluation of an action (fast reward). Implicit search will be implemented as MCTS(depth=..., iterations=1).
 
@@ -68,7 +68,7 @@ With a provided key with \$200 of credit, not only is a subset needed, but also 
 Despite gpt-4o-mini being a distill of gpt-4o, the scaling results may not necessarily generalize to gpt-4o, and should be taken with caution. 
 
 
-### Search on an Internal World Model
+** Search on an Internal World Model **
 
 Another alternative to addressing the backtracking issue in the explicit search on the environment case is to search and backtrack not on the actual environment, but instead on a simulated "LLM dream". On top of having a step function for the browsergym environment, you also have the LLM approximate the results on the step function. This addresses the issue of some actions being irreversible with the downside of becoming dependent on the LLM's ability to "dream" the browser environment accurately. As such, the LLM is considered an Internal (as opposed to the external, real browser environment) World Model (where our "world" is the browser environment). 
 
