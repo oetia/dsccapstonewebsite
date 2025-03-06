@@ -16,22 +16,12 @@ A key challenge in developing effective web agents lies in their ability to gene
 
 Recent advances in large language models (LLMs) have significantly improved the viability of web agents. By leveraging LLMs’ ability to process textual and structural web data, along with prompting techniques such as Tree of Thought prompting (Yao 2024), these agents can be guided by high-level reasoning rather than rigid scripts. However, as shown in works such as Tree Search for Language Model Agents (Koh 2024), even the most capable LLM-based agents face substantial obstacles, such as the complexity of web environments, the vast possible action space, and the difficulty of handling long-horizon tasks where errors compound over time. Increasing the computation available to an LLM agent can naturally increase the performance, however, **_the question remains of how best to scale inference time compute._**
 
-Web-based agents using LLMs show promise in automating browser tasks, but scaling inference efficiently remains a challenge. This work explores the question of how best to structure search: implicit (greedy, depth-limited) or explicit (structured exploration like MCTS). Implicit search is potentially computationally cheaper but struggles with backtracking, while explicit search enables efficient exploration but relies on resettable states, which may be impractical in real-world web environments. Experiments on 106 WebArena tasks show explicit search achieves higher task completion rates and better environment interaction efficiency. While explicit search excels in controlled settings, implicit search remains more applicable to real-world tasks. Another aspect to consider is conducting an explicit search on an LLM world model, where the search occurs over predicted next states as opposed to the environment itself, which can potentially gain the benefits of both implicit and explicit search. These techniques extend beyond web environments, and are applicable to OS automation (OsWorld) and dynamic game environments (MineDojo).
+Web/OS-based agents using LLMs show promise in automating browser and operating system tasks, but scaling inference efficiently remains a challenge. This work explores the question of how best to structure search: implicit (greedy, depth-limited) or explicit (structured exploration like MCTS). Implicit search is potentially computationally cheaper but struggles with backtracking, while explicit search enables efficient exploration but relies on resettable states, which may be impractical in real-world web environments. Experiments on 106 WebArena and 50 OSWorld tasks show explicit search achieves higher task completion rates and better environment interaction efficiency. While explicit search excels in controlled settings, implicit search remains more applicable to real-world tasks. Another aspect to consider is conducting an explicit search on an LLM world model, where the search occurs over predicted next states as opposed to the environment itself, which can potentially gain the benefits of both implicit and explicit search. 
 
 
-### LLM-Reasoners
+## Methods - LLM-Reasoners
 
-[LLM-Reasoners](https://www.llm-reasoners.net/) (Hao 2024) is a standardized, library for creating reasoning agents with a modular framework for customizing the LLM, search algorithm, search configuration, world model, and benchmark architecture. We leverage LLM-Reasoners to investigate this behavior in Monte Carlo Tree Search (MCTS) scaling experiments. 
-
-<!--Insert Plots-->
-![Custom Agent Architecture via LLM-Reasoners](/images/reasoners.png)
-- Custom Agent Architecture via LLM-Reasoners
-
-![MCTS Tree + Visualizer Architecture](/images/visualizer.png)
-- LLM-Reasoners visualizer architecture
-
-![MCTS Tree + Visualizer Architecture](/images/bigdfs.png)
-- MCTS Tree via LLM-Reasoners visualizer
+[LLM-Reasoners](https://www.llm-reasoners.net/) (Hao 2024) is a standardized, library for creating reasoning agents with a modular framework for customizing the LLM, search algorithm, search configuration, world model, and benchmark architecture. We leverage LLM-Reasoners to investigate this behavior in Monte Carlo Tree Search (MCTS) scaling experiments on the BrowserGym and OSWorld benchmarks. 
 
 
 ## Methods - Browsergym
