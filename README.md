@@ -115,22 +115,73 @@ To best support the development of reasoning algorithms, we have directly integr
 
 ## Results - Browsergym
 
+**Experiment Results**
+
 | Name                                          | Successes | Failures | Errors |
 | --------------------------------------------- | --------- | -------- | ------ |
 | 4o-mini MCTS (depth=5, iterations=10)         | 15        | 89       | 2      |
 | 4o-mini MCTS (depth=10, iterations=10)        | 21        | 82       | 3      |
 | 4o-mini MCTS (depth=20, iterations=10)        | 35        | 67       | 4      |
 | 4o-mini MCTS (depth=100, iterations=1)        | 23        | 71       | 4      |
-|                                               |           |          |        |
 | qwen2.5-32b MCTS (depth=5, iterations=10)     | 8         | 91       | 7      |
 | qwen2.5-32b MCTS (depth=10, iterations=10)    | 12        | 85       | 9      |
 | qwen2.5-32b MCTS (depth=20, iterations=10)    | 14        | 83       | 9      |
 | qwen2.5-32b MCTS (depth=100, iterations=1)    | 9         | 74       | 13     |
-|                                               |           |          |        |
 | r1-distill-32b MCTS (depth=5, iterations=10)  | 25        | 81       | 0      |
 | r1-distill-32b MCTS (depth=10, iterations=10) | 34        | 69       | 3      |
 | r1-distill-32b MCTS (depth=20, iterations=10) | 35        | 70       | 1      |
 | r1-distill-32b MCTS (depth=100, iterations=1) | 28        | 75       | 3      |
+
+**More Information**
+
+| Name                                          | Success Rate | Total Cost (USD) | Total Time (Hours) |
+| --------------------------------------------- | ------------ | ---------------- | ------------------ |
+| 4o-mini MCTS (depth=5, iterations=10)         | 0.1415       | 4.86             | 11.3430            |
+| 4o-mini MCTS (depth=10, iterations=10)        | 0.1981       | 6.41             | 15.8691            |
+| 4o-mini MCTS (depth=20, iterations=10)        | 0.3302       | 9.01             | 25.3912            |
+| 4o-mini MCTS (depth=100, iterations=1)        | 0.2347       | 24.35            | 42.0037            |
+| qwen2.5-32b MCTS (depth=5, iterations=10)     | 0.0754       | N/A              | 14.1157            |
+| qwen2.5-32b MCTS (depth=10, iterations=10)    | 0.1132       | N/A              | 20.3258            |
+| qwen2.5-32b MCTS (depth=20, iterations=10)    | 0.1320       | N/A              | 38.5611            |
+| qwen2.5-32b MCTS (depth=100, iterations=1)    | 0.0849       | N/A              | 22.3750            |
+| r1-distill-32b MCTS (depth=5, iterations=10)  | 0.2358       | N/A              | 50.1258            |
+| r1-distill-32b MCTS (depth=10, iterations=10) | 0.3207       | N/A              | 65.4553            |
+| r1-distill-32b MCTS (depth=20, iterations=10) | 0.3301       | N/A              | 107.2980           |
+| r1-distill-32b MCTS (depth=100, iterations=1) | 0.2641       | N/A              | 172.0004           |
+
+The 4o-mini errors in the Table \ref{tab:explicitenv_success} are for when the LLM doesn't follow the required JSON format in it's response. The likelihood an LLM formats incorrectly is small, however, given that a task at depth 100, can end up performing close to a thousand LLM calls through action proposals and evaluations, such parsing errors will manifest. For the future, this can be addressed by redoing the LLM call upon a parse failure.
+
+For the deepseek r1 distill on qwen2.5 32b instruct, these errors are usually due to timeouts from the environment. Another thing to note is that max_response_length has been capped at 8192. Removing the cap, the performance would likely be better, however, the run times would become even longer. Can be explored later.
+
+For the qwen2.5 32b errors, there is likely a bug. The errors are far too high given the baseline of 4o-mini, so the results should be taken with a grain of salt. They are probably lower than they should be.
+
+Next, on the topic of cost, the total cost of the 4o-mini experiments was (4.86 + 6.41 + 9.01 + 24.35) = **$44.63 USD**. Evaluating on the whole dataset would 8x, and evaluating on gpt-4o instead of 4o-mini would 15x leading to an estimated cost of (44.63 \* 8 \* 15) = **$5,355.60 USD**. As expected, that would've been expensive.
+
+Since the deepseek and qwen models are hosted locally, the cost would not be calculated through APIs, but instead through electricity usage. The experiments are run through the "single program multiple data" paradigm (SPMD), so the "Total Time" column would be if running every single task in serial. Though not tracked, it's very likely that the kWh usage was less than that of running an H100 node at full power draw for 24 hours, which would be (0.7kW \* 8 gpus \* 24 hours) = 134.4 kWh. Assuming you can get electricity at 15 cents per kWh, that amounts to approximately \$20 USD.
+
+**Iterations and Depth**
+
+<p align="center">
+  <img src="./images/tcvci-alt.png"/>
+</p>
+
+Using a single run at MCTS(depth=..., iterations=10), runs at all lower iterations can be extrapolated. The results are in Figure \ref{fig:tcvci}. As the iterations increase, performance naturally does as well. However, something interesting to note is that most of the task completions occur during the first few iterations. When looking at just the first iteration, at MCTS(depth=5) 13 tasks have been completed, at MCTS(depth=10) 17 tasks have been completed, and at MCTS(depth=20) 29 tasks have been completed. This suggests that depth is important for completing the tasks on webarena, which makes sense. Many tasks in the webarena benchmark are designed to be completed in a little under 10 steps. However, have more depth likely benefits the agent through giving it more room to take suboptimal actions that may still lead towards task completion.
+
+Having a greater depth, also seems to benefit the performance increase from iterations. This also makes sense. Iterations are really only useful so long as the search space available contains a possible correct trajectory. With only 10 iterations, the searchable space isn't that large, which makes having a larger subspace of correct solutions beneficial. So long as the LLM evaluator can roughly "guide" the agent into this subspace, the performance should be better.
+
+On the contrary, if the search space available has only a very narrow subspace of correct trajectories, the search can easily get stuck in a bad subspace and waste its iterations. The total number of tasks is 106, and yet the number of successes in the best case was 35. Almost every single failure ends up going to the maximum iterations, which is to be expected. The majority of the tokens used were on failures. If the agent is using lots of iterations, that's a strong indicator that it's stuck in a bad subspace and likely will fail.
+
+**Comparing Implicit and Explicit Search**
+
+<p align="center">
+  <img src="./images/tcves.png"/>
+</p>
+
+For the implicit search, while having a extra depth does help, the returns from depth also do seem to diminish. There are many cases where after depth 20, the agent gets stuck and sends the noop() action 80 times until it hits the depth limit, or it ends up going back and forth between two actions until the depth limit. Similar to the iterations in the explicit search, as the depth increases, if the agent is stuck in a bad subspace, the depth increase won't do much to help.
+
+As a note, in order to compare between the explicit and implicit search scenarios, the x-axis in this chart refers to the number of environment interactions used.
+
+When comparing the two, as expected, since the explicit search is fundamentally designed to address the issue of backtracking difficulties with implicit search, along with an in-built exploration/exploitation trade-off via MCTS, it's hardly surprising that the performance is notably better. However, once again, one of the key advantages of implicit search is that it's usable in real world environments, with potentially constant updates to an external server state.
 
 ## Methods - OSWorld
 
