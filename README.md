@@ -4,28 +4,19 @@ Trevan Nguyen, Nathaniel Del Rosario, Aaryan Agrawal, Zihan Liu, Samuel Zhang, Z
 
 ## Introduction 
 
-Web-based agents using LLMs show promise in automating browser tasks,
-but scaling inference efficiently remains a challenge. This work explores the
-question of how best to structure search: implicit (greedy, depth-limited) or
-explicit (structured exploration like MCTS). Implicit search is potentially com-
-putationally cheaper but struggles with backtracking, while explicit search
-enables efficient exploration but relies on resettable states, which may be im-
-practical in real-world web environments. Experiments on 106 WebArena
-tasks show explicit search achieves higher task completion rates and better
-environment interaction efficiency. While explicit search excels in controlled
-settings, implicit search remains more applicable to real-world tasks. An-
-other aspect to consider is conducting an explicit search on an LLM world
-model, where the search occurs over predicted next states as opposed to the
-environment itself, which can potentially gain the benefits of both implicit
-and explicit search. These techniques extend beyond web environments, and
-should theoretically be applicable to OS automation (OsWorld) and dynamic
-game environments (MineDojo).
+The web is an expansive and dynamic environment, hosting an immense wealth of information and variety in user interfaces. As the digital world has become an integral component of our world, automating interactions with the web has become an increasingly compelling goal. Web agents hold the promise of transforming how we fundamentally interact with online platforms. These agents could streamline workflows, assist in research, facilitate accessibility, and even execute complex multi-step tasks across different websites.
+
+A key challenge in developing effective web agents lies in their ability to generalize across diverse web environments. Unlike domain-specific automation tools, such as web scrapers or task-specific scripts/extensions, a robust web agent must handle an open-ended action space, reasoning through arbitrary interfaces much like a human user would. This involves interpreting webpage structures, making decisions based on evolving states, and recovering from errors when unexpected behaviors arise.
+
+Recent advances in large language models (LLMs) have significantly improved the viability of web agents. By leveraging LLMs’ ability to process textual and structural web data, along with prompting techniques such as Tree of Thought prompting (Yao 2024), these agents can be guided by high-level reasoning rather than rigid scripts. However, as shown in works such as Tree Search for Language Model Agents (Koh 2024), even the most capable LLM-based agents face substantial obstacles, such as the complexity of web environments, the vast possible action space, and the difficulty of handling long-horizon tasks where errors compound over time. Increasing the computation available to an LLM agent can naturally increase the performance, however, the question remains how is it best to do so. 
+
+Web-based agents using LLMs show promise in automating browser tasks, but scaling inference efficiently remains a challenge. This work explores the question of how best to structure search: implicit (greedy, depth-limited) or explicit (structured exploration like MCTS). Implicit search is potentially computationally cheaper but struggles with backtracking, while explicit search enables efficient exploration but relies on resettable states, which may be impractical in real-world web environments. Experiments on 106 WebArena tasks show explicit search achieves higher task completion rates and better environment interaction efficiency. While explicit search excels in controlled settings, implicit search remains more applicable to real-world tasks. Another aspect to consider is conducting an explicit search on an LLM world model, where the search occurs over predicted next states as opposed to the environment itself, which can potentially gain the benefits of both implicit and explicit search. These techniques extend beyond web environments, and are applicable to OS automation (OsWorld) and dynamic game environments (MineDojo).
 
 ## Methods
 
 ### Browsergym
 
-Browsergym \cite{chezelles2024browsergym} is the primary environment that we are focusing on. Browsergym essentially provides an OpenAI gym-like environment \cite{brockman2016openai} for the web browser. The env object takes in an action represented as code and provides an observation at each step. By utilizing the browsergym library, we can test the performance of our web agent on two key browser task benchmarks: \textbf{WebArena} \cite{zhou2023webarena} and \textbf{Assistantbench} \cite{yoran2024assistantbench}.
+Browsergym (Chezelles 2024) is the primary environment that we are focusing on. Browsergym essentially provides an OpenAI gym-like environment (Brockman 2016) for the web browser. The env object takes in an action represented as code and provides an observation at each step. By utilizing the browsergym library, we can test the performance of our web agent on two key browser task benchmarks: WebArena (Zhou 2023) and Assistantbench (Yoran 2024).
 
 ### Actions
 
