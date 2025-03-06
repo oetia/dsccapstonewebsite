@@ -25,7 +25,7 @@ Web-based agents using LLMs show promise in automating browser tasks, but scalin
 Browsergym (Chezelles 2024) is the primary environment that we are focusing on. Browsergym essentially provides an OpenAI gym-like environment (Brockman 2016) for the web browser. The env object takes in an action represented as code and provides an observation at each step. By utilizing the browsergym library, we can test the performance of our web agent on two key browser task benchmarks: WebArena (Zhou 2023) and Assistantbench (Yoran 2024).
 
 <p align="center">
-  <img src="./images/bgym.png"/>
+  <img width="75%" src="./images/bgym.png"/>
 </p>
 
 **Actions**
@@ -74,6 +74,17 @@ However, for explicit search and iterations, such a convenient property does exi
 
 With these bits of information in mind, for explicit search, there will be separate runs which will all share the same number of iterations at 10, but have varying depths of 5, 10, and 20.
 
+With how these experiments are structured, the subsequent search trees can end up being massive. Cost needs to be a considered factor.
+
+<p align="center">
+  <img src="./images/tree1.png"/>
+</p>
+<p align="center">
+  <img src="./images/tree2.png"/>
+</p>
+
+**Cost Analysis**
+
 In the context of browsergym, the benchmark used for these experimental runs will be the webarena benchmark. Of over 800 tasks provided, a subset of 106 tasks will be evaluated on. The main reason for a subset fundamentally comes down to a matter of cost. When running a single example on gpt-4o with MCTS(depth=20, iterations=10), the cost can already easily exceed \$1 USD. Should you evaluate on the entire dataset with gpt-4o, a single run would likely take over \$1000. With 4 runs planned, some of them likely to be far more expensive than \$1 per task, the estimated cost of this entire experiment would likely be more than \$4000.
 
 With a provided key with \$200 of credit, not only is a subset needed, but also a cheaper model. These experiments will be conducted on said subset of 106 tasks, and also utilize gpt-4o-mini instead of gpt-4o, which should further reduce the costs by approximately 15 fold. The number of action proposals at each step will be kept at 10. While it could be set much higher, with a proposal temperature of 0.7, often over half of the proposals end up being duplicate actions. Scaling n proposals at each step is another axis and increasing it to a 100 or more would likely also benefit performance, but that can be explored later. For now, keeping n proposals fixed at 10 should provide enough variety in responses for benefits to be attainable from search.
@@ -83,5 +94,11 @@ Despite gpt-4o-mini being a distill of gpt-4o, the scaling results may not neces
 **Search on an Internal World Model**
 
 Another alternative to addressing the backtracking issue in the explicit search on the environment case is to search and backtrack not on the actual environment, but instead on a simulated "LLM dream". On top of having a step function for the browsergym environment, you also have the LLM approximate the results on the step function. This addresses the issue of some actions being irreversible with the downside of becoming dependent on the LLM's ability to "dream" the browser environment accurately. As such, the LLM is considered an Internal (as opposed to the external, real browser environment) World Model (where our "world" is the browser environment).
+
+**Visualizer**
+
+To best support the development of reasoning algorithms, we have directly integrated the improved LLM reasoners visualizer into the AgentLab x-ray tool. Using AgentLab, every action the LLM takes first generates an MCTS tree that is searched for the best outcome. When looking at a run, it is inconvenient to move to a different website to look at the visualizer for each step. Thus, the visualizer is created automatically for each action and embedded directly in the x-ray tool.
+
+Some Example Visualizer Links: [1](https://www.llm-reasoners.net/visualizer/3d03a5cb-d67a-4f38-bf81-0ca8ec3b28e8?accessKey=f0f4b36b) [2](https://www.llm-reasoners.net/visualizer/96e5f87d-4b70-4e61-8b47-d3fc57879204?accessKey=9f69d408)
 
 ## Results
