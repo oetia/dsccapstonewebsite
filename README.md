@@ -101,7 +101,9 @@ For this reason, alongside the axes of iterations and depth, there will be anoth
 
 **Search on an Internal World Model**
 
-Another alternative to addressing the backtracking issue in the explicit search on the environment case is to search and backtrack not on the actual environment, but instead on a simulated "LLM dream". On top of having a step function for the browsergym environment, you also have the LLM approximate the results on the step function. This addresses the issue of some actions being irreversible with the downside of becoming dependent on the LLM's ability to "dream" the browser environment accurately. As such, the LLM is considered an Internal (as opposed to the external, real browser environment) World Model (where our "world" is the browser environment).
+Another alternative to addressing the backtracking issue in the explicit search on the environment case is to search and backtrack not on the actual environment, but instead on a simulated "LLM dream". On top of having a step function for the browsergym environment, the LLM approximates the results of the step function. This addresses the issue of some actions being irreversible with the downside of becoming dependent on the LLM's ability to "dream" the browser environment accurately. As such, the LLM is considered an Internal (as opposed to the external, real browser environment) World Model (where our "world" is the browser environment). For this setup, the main axis we scaled up was the number of proposals we sample from the LLM at each step. If we sample multiple proposals from the LLM, we also must create a way to evaluate the action proposals to determine which to take next. For this, we tested negative log likelihood ranking and reward model ranking. 
+
+Negative log likelihood ranking simply ranks the LLM's outputs based on the likelihoods that are contained in the API call's response. We can interpret the likelihood as the model's confidence in it's answer, and thus we can utilize this metric to rank responses. In the reward model ranking method, we use another instance of 4o-mini as a reward model, which assigns an integer score to the action proposal. Higher rewards will indicate that the reward model believes this action is likely to bring the model closer to solving the problem, and vice versa. 
 
 **Visualizer**
 
@@ -189,6 +191,40 @@ As a note, in order to compare between the explicit and implicit search scenario
 
 When comparing the two, as expected, since the explicit search is fundamentally designed to address the issue of backtracking difficulties with implicit search, along with an in-built exploration/exploitation trade-off via MCTS, it's hardly surprising that the performance is notably better. However, once again, one of the key advantages of implicit search is that it's usable in real world environments, with potentially constant updates to an external server state.
 
+**Search on Internal World Model**
+For this experiment, we scaled up the number of proposals that the LLM would provide at each step of the task. This can be done simply with a `n=` parameter in the LLM's API call. In addition to the the WebArena benchmark, we tested on the AssistantBench benchmark, a much more difficult benchmark which requires the model to interact with the open web. 
+
+Results on AssistantBench, Negative Log Likelihood Ranking
+
+
+| Experiment Config | Successes | Failures | Errors |
+|-------------------|-----------|----------|--------|
+| N = 2           | 0         | 10       | 0      |
+| N = 4           | 0         | 10       | 0      |
+| N = 8           | 1         | 9        | 0      |
+| N = 16          | 0         | 10       | 0      |
+| N = 32          | 0         | 10       | 0      |
+| N = 64          | 0         | 10       | 0      |
+| N = 128         | 0         | 10       | 0      |
+
+
+Results on WebArena, Reward Model Ranking
+
+
+| Experiment Config | Successes | Failures | Errors |
+|--------|---------|---------|---------|
+| N = 2  | 5       | 17      | 0       |
+| N = 4  | 5       | 17      | 0       |
+| N = 8  | 6       | 16      | 0       |
+| N = 16 | 5       | 17      | 0       |
+| N = 32 | 6       | 16      | 0       |
+| N = 64 | 5       | 17      | 0       |
+
+
+In the AssistantBench results, we see that the model is incapable of solving any tasks, even with a scaled up proposal number of 128. This indicates that AssistantBench is simply too hard for a weak model like 4o-mini to perform well in. We were only able to test on 10 tasks because each experiment could take up to 30 minutes. The results also indicate that likelihood may not be a good indicator of how good an action proposal is. 
+
+In the WebArena results, we see more of the same, where the success rates do not change, even after scaling up the action proposals. We also see no evidence that the reward model ranking method has outperformed the log likelihood method. However, we may see improvements with this method if we used a strong base model for the reward model, such as GPT-4o. It is plausible that a stronger reward model may be able to guide the weaker model (GPT-4o-mini in our case) to select better action proposals. This can be explored in future work.
+
 ## Methods - OSWorld
 
 [OSWorld](https://os-world.github.io/) is a desktop environment for evaluating agents on operating system benchmark tasks such as Chrome, VSCode, Gimp, etc. To complete a task, a web agent must take multiple sequential actions. Errors in later steps can make a task irrecoverable without backtracking. Two primary approaches to search are considered: implicit search, where the agent itself attempts to recover from mistakes, and explicit search, where a structured algorithm like Monte Carlo Tree Search (MCTS) assists in decision-making.
@@ -226,6 +262,8 @@ Experiments on 106 WebArena and 50 OSWorld tasks show explicit search achieves h
 Web/OS-based agents using LLMs show promise in automating browser tasks, but scaling inference efficiently remains a challenge. This work explores the question of how best to structure search: implicit (greedy, depth-limited) or explicit (structured exploration like MCTS). Implicit search is potentially computationally cheaper but struggles with backtracking, while explicit search enables efficient exploration but relies on resettable states, which may be impractical in real-world web environments. 
 
 Experiments on 106 WebArena and 50 OSWorld tasks show explicit search achieves higher task completion rates and better environment interaction efficiency. While explicit search excels in controlled settings, implicit search remains more applicable to real-world tasks. Another aspect to consider is conducting an explicit search on an LLM world model, where the search occurs over predicted next states as opposed to the environment itself, which can potentially gain the benefits of both implicit and explicit search.
+
+The internal world model search experiments on a subset of WebArena and AssistantBench tasks indicate that this method is likely not desirable for tasks that may require planning.
 
 ## Acknowledgements
 
