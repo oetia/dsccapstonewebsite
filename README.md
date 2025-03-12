@@ -238,7 +238,7 @@ In the WebArena results, we see more of the same, where the success rates do not
 
 ## Results - OSWorld
 
-In summary, the UITARS-72B model performed substantially better than both 4o-mini and 4o, and in general task success saw an increased correlation with the number of MCTS iterations and depth.
+In summary, the UITARS-7B and UITARS-72B model performed substantially better than both 4o-mini and 4o. We ran one experiment utilizing MCTS on UITARS-7B with 2 iterations and a depth of 15. Because UITARS is fine-tuned to output UI instructions, it struggles to self-evaluate and provide scores for each action. Instead, we use GPT 4o-mini as the evaluation LLM. Even with a lower depth, using MCTS greatly outperforms the default agent, even surpassing the UITARS 70B model at similar depths. We were unable to run a full experiment on the larger model with MCTS due to time constraints, but we believe that explicit search should allow for large improvements there as well.
 
 <!--OSWorld Inference/Compute Scaling Plots-->
 ![](/images/uitars-depth-of-n.png)
@@ -251,19 +251,13 @@ In summary, the UITARS-72B model performed substantially better than both 4o-min
 - UITARS-72B through 15 Steps (no MCTS)
 
 
-## Discussion
-
-Web/OS-based agents using LLMs show promise in automating browser tasks, but scaling inference efficiently remains a challenge. This work explores the question of how best to structure search: implicit (greedy, depth-limited) or explicit (structured exploration like MCTS). Implicit search is potentially computationally cheaper but struggles with backtracking, while explicit search enables efficient exploration but relies on resettable states, which may be impractical in real-world web environments. 
-
-Experiments on 106 WebArena and 50 OSWorld tasks show explicit search achieves higher task completion rates and better environment interaction efficiency. While explicit search excels in controlled settings, implicit search remains more applicable to real-world tasks. Another aspect to consider is conducting an explicit search on an LLM world model, where the search occurs over predicted next states as opposed to the environment itself, which can potentially gain the benefits of both implicit and explicit search.
-
 ## Conclusion
 
 Web/OS-based agents using LLMs show promise in automating browser tasks, but scaling inference efficiently remains a challenge. This work explores the question of how best to structure search: implicit (greedy, depth-limited) or explicit (structured exploration like MCTS). Implicit search is potentially computationally cheaper but struggles with backtracking, while explicit search enables efficient exploration but relies on resettable states, which may be impractical in real-world web environments. 
 
 Experiments on 106 WebArena and 50 OSWorld tasks show explicit search achieves higher task completion rates and better environment interaction efficiency. While explicit search excels in controlled settings, implicit search remains more applicable to real-world tasks. Another aspect to consider is conducting an explicit search on an LLM world model, where the search occurs over predicted next states as opposed to the environment itself, which can potentially gain the benefits of both implicit and explicit search.
 
-The internal world model search experiments on a subset of WebArena and AssistantBench tasks indicate that this method is likely not desirable for tasks that may require planning.
+The internal world model search experiments on a subset of WebArena and AssistantBench tasks indicate that this method is likely not desirable for tasks that may require planning. All in all, task success saw an increased correlation with the number of MCTS iterations and depth, showing promise for how agentic LLMs can be improved in the future.
 
 ## Acknowledgements
 
